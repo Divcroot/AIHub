@@ -39,7 +39,7 @@ export const AuthProvider = ({
     useEffect(() => {
         const restoreSession = async () => {
             try {
-                const response = await api.me();
+                const response = await api.auth.me();
                 setUser(response.user);
             } catch {
                 setUser(null);
@@ -55,7 +55,7 @@ export const AuthProvider = ({
         email: string,
         password: string
     ) => {
-        const response = await api.login({
+        const response = await api.auth.login({
             email,
             password
         });
@@ -68,7 +68,7 @@ export const AuthProvider = ({
         email: string,
         password: string
     ) => {
-        const response = await api.register({
+        const response = await api.auth.register({
             name,
             email,
             password
@@ -78,7 +78,7 @@ export const AuthProvider = ({
     };
 
     const logout = async () => {
-        await api.logout();
+        await api.auth.logout();
         setUser(null);
     };
 

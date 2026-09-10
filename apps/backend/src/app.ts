@@ -3,6 +3,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/auth.routes.js";
+import noteRoutes from "./routes/note.routes.js";
+import documentRoutes from "./routes/document.routes.js";
 import { errorHandler } from "./middleware/error.middleware.js";
 import { notFoundHandler } from "./middleware/not-found.middleware.js";
 
@@ -26,6 +28,8 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/notes", noteRoutes);
+app.use("/api/documents", documentRoutes);
 
 app.use(notFoundHandler);
 

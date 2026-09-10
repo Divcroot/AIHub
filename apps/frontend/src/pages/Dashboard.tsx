@@ -1,7 +1,8 @@
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 function Dashboard() {
-    
+
     const { user, logout } = useAuth();
 
     return (
@@ -29,6 +30,20 @@ function Dashboard() {
                 <p className="mt-2 text-zinc-400">
                     Your knowledge base starts here.
                 </p>
+
+                <div className="flex items-center justify-between">
+                    <Link
+                        to="/notes"
+                        className="mt-8 inline-block rounded-lg bg-white px-5 py-3 font-medium text-black"
+                    >
+                        Open Knowledge Base
+                    </Link>
+
+                    <Link to="/documents" className="mt-8 inline-block rounded-lg bg-white px-5 py-3 font-medium text-black">
+                        Documents
+                    </Link>
+                </div>
+
             </section>
         </main>
     );

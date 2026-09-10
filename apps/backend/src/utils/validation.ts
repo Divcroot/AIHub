@@ -30,3 +30,38 @@ export const loginSchema = z.object({
         .string()
         .min(1, "Password is required")
 });
+
+export const createNoteSchema = z.object({
+    title: z
+        .string()
+        .trim()
+        .min(1, "Title is required")
+        .max(200, "Title must be at most 200 characters"),
+
+    content: z
+        .unknown(),
+
+    contentText: z
+        .string()
+        .max(500_000, "Content is too large")
+        .default(""),
+
+    tags: z
+        .array(
+            z
+                .string()
+                .trim()
+                .min(1)
+                .max(50)
+        )
+        .max(20)
+        .default([]),
+
+    folderId: z
+        .string()
+        .regex(/^[a-f\d]{24}$/i, "Invalid folder ID")
+        .nullable()
+        .optional()
+});
+
+export const updateNoteSchema = createNoteSchema.partial();

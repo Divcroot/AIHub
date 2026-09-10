@@ -10,14 +10,22 @@ const request = async <T>(
 ): Promise<T> => {
     const { body, ...fetchOptions } = options;
 
+    const isFormData = body instanceof FormData;
+
     const response = await fetch(`${API_URL}${endpoint}`, {
         ...fetchOptions,
         credentials: "include",
         headers: {
-            "Content-Type": "application/json",
+            ...(isFormData
+                ? {}
+                : { "Content-Type": "application/json" }),
             ...fetchOptions.headers
         },
-        body: body ? JSON.stringify(body) : undefined
+        body: isFormData
+            ? body
+            : body
+                ? JSON.stringify(body)
+                : undefined
     });
 
     const data = await response.json();
@@ -36,6 +44,29 @@ export interface User {
     createdAt: string;
 }
 
+export interface Note {
+    _id: string;
+    userId: string;
+    title: string;
+    content: unknown;
+    contentText: string;
+    tags: string[];
+    folderId?: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface Document {
+    _id: string;
+    userId: string;
+    originalName: string;
+    mimeType: string;
+    size: number;
+    status: "processing" | "ready" | "failed";
+    createdAt: string;
+    updatedAt: string;
+}
+
 interface AuthResponse {
     success: boolean;
     message: string;
@@ -49,36 +80,121 @@ export const api = {
             message: string;
         }>("/api/health"),
 
-    register: (data: {
-        name: string;
-        email: string;
-        password: string;
-    }) =>
-        request<AuthResponse>("/api/auth/register", {
-            method: "POST",
-            body: data
-        }),
+    auth: {
+        register: (data: {
+            name: string;
+            email: string;
+            password: string;
+        }) =>
+            request<AuthResponse>("/api/auth/register", {
+                method: "POST",
+                body: data
+            }),
 
-    login: (data: {
-        email: string;
-        password: string;
-    }) =>
-        request<AuthResponse>("/api/auth/login", {
-            method: "POST",
-            body: data
-        }),
+        login: (data: {
+            email: string;
+            password: string;
+        }) =>
+            request<AuthResponse>("/api/auth/login", {
+                method: "POST",
+                body: data
+            }),
 
-    logout: () =>
-        request<{
-            success: boolean;
-            message: string;
-        }>("/api/auth/logout", {
-            method: "POST"
-        }),
+        logout: () =>
+            request<{
+                success: boolean;
+                message: string;
+            }>("/api/auth/logout", {
+                method: "POST"
+            }),
 
-    me: () =>
-        request<{
-            success: boolean;
-            user: User;
-        }>("/api/auth/me")
+        me: () =>
+            request<{
+                success: boolean;
+                user: User;
+            }>("/api/auth/me"),
+    },
+
+    notes: {
+        getAll: () =>
+            request<{
+                success: boolean;
+                notes: Note[];
+            }>("/api/notes"),
+
+        getById: (id: string) =>
+            request<{
+                success: boolean;
+                note: Note;
+            }>(`/api/notes/${id}`),
+
+        create: (data: {
+            title: string;
+            content: unknown;
+            contentText: string;
+            tags?: string[];
+            folderId?: string | null;
+        }) =>
+            request<{
+                success: boolean;
+                note: Note;
+            }>("/api/notes", {
+                method: "POST",
+                body: data
+            }),
+
+        update: (
+            id: string,
+            data: {
+                title?: string;
+                content?: unknown;
+                contentText?: string;
+                tags?: string[];
+                folderId?: string | null;
+            }
+        ) =>
+            request<{
+                success: boolean;
+                note: Note;
+            }>(`/api/notes/${id}`, {
+                method: "PATCH",
+                body: data
+            }),
+
+        delete: (id: string) =>
+            request<{
+                success: boolean;
+                message: string;
+            }>(`/api/notes/${id}`, {
+                method: "DELETE"
+            })
+    },
+
+    documents: {
+        getAll: () =>
+            request<{ success: boolean; documents: Document[] }>(
+                "/api/documents"
+            ),
+
+        upload: (file: File) => {
+            const formData = new FormData();
+            formData.append("file", file);
+
+            return request<{
+                success: boolean;
+                document: Document;
+            }>("/api/documents/upload", {
+                method: "POST",
+                body: formData
+            });
+        },
+
+        delete: (id: string) =>
+            request<{ success: boolean; message: string }>(
+                `/api/documents/${id}`,
+                {
+                    method: "DELETE"
+                }
+            )
+    }
 };

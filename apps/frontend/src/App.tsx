@@ -8,10 +8,12 @@ import {
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+import Notes from "./pages/Notes";
+import Documents from "./pages/Documents";
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  
+
   return (
     <BrowserRouter>
       <Routes>
@@ -27,6 +29,14 @@ function App() {
             path="/dashboard"
             element={<Dashboard />}
           />
+
+          <Route
+            path="/notes"
+            element={<Notes />}
+          />
+
+          <Route path="/documents" element={<Documents />} />
+          
         </Route>
 
         <Route
