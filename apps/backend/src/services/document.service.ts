@@ -2,6 +2,8 @@ import { PDFParse } from "pdf-parse";
 import mammoth from "mammoth";
 import { Types } from "mongoose";
 import { DocumentModel } from "../models/document.model";
+import { DocumentChunk } from "../models/document-chunk.model.js";
+import { chunkText } from "./chunk.service.js";
 
 interface UploadedFile {
     buffer: Buffer;
@@ -65,4 +67,25 @@ export const deleteDocument = async (
     }
 
     return document;
+};
+
+export const createDocumentChunks = async (
+    documentId: Types.ObjectId,
+    userId: Types.ObjectId,
+    text: string
+) => {
+    const chunks = chunkText(text);
+
+    if (chunks.length === 0) {
+        return [];
+    }
+
+    const documents = chunks.map((chunk) => ({
+        documentId,
+        userId,
+        content: chunk.content,
+        chunkIndex: chunk.chunkIndex
+    }));
+
+    return DocumentChunk.insertMany(documents);
 };

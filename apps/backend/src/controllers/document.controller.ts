@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { DocumentModel } from "../models/document.model.js";
-import { extractDocumentText, getUserDocuments, deleteDocument } from "../services/document.service.js";
+import { extractDocumentText, getUserDocuments, deleteDocument, createDocumentChunks } from "../services/document.service.js";
 import { AppError } from "../utils/app-error.js";
 
 export const upload = async (
@@ -44,6 +44,12 @@ export const upload = async (
 
             status: "ready"
         });
+
+        await createDocumentChunks(
+            document._id,
+            req.user._id,
+            extractedText
+        );
 
         res.status(201).json({
             success: true,
