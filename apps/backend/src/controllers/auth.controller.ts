@@ -4,6 +4,7 @@ import { registerUser } from "../services/auth.service.js";
 import { loginSchema } from "../utils/validation.js";
 import { loginUser } from "../services/auth.service.js";
 import { AppError } from "../utils/app-error.js";
+import { env } from "../config/env.js";
 
 export const register = async (
     req: Request,
@@ -69,8 +70,9 @@ export const login = async (
 
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
+            secure: env.NODE_ENV === "production",
             sameSite: "lax",
+            path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
@@ -123,8 +125,9 @@ export const logout = (
 ): void => {
     res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax"
+        secure: env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/"
     });
 
     res.status(200).json({
