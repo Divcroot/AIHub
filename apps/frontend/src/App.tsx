@@ -1,26 +1,45 @@
-import { useEffect, useState } from "react";
-import { api } from "./lib/api";
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes
+} from "react-router-dom";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
-  const [status, setStatus] = useState("Checking API...");
-
-  useEffect(() => {
-    api
-      .health()
-      .then((data) => setStatus(data.message))
-      .catch(() => setStatus("API connection failed"));
-  }, []);
-
+  
   return (
-    <main className="min-h-screen bg-zinc-950 text-white flex items-center justify-center">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold">AI Knowledge Hub</h1>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<Login />} />
 
-        <p className="mt-4 text-zinc-400">
-          {status}
-        </p>
-      </div>
-    </main>
+        <Route
+          path="/register"
+          element={<Register />}
+        />
+
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/dashboard"
+            element={<Dashboard />}
+          />
+        </Route>
+
+        <Route
+          path="/"
+          element={<Navigate to="/dashboard" replace />}
+        />
+
+        <Route
+          path="*"
+          element={<Navigate to="/dashboard" replace />}
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
